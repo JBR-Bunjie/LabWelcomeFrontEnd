@@ -1,0 +1,47 @@
+<body style=margin:0>
+	<canvas id=q></canvas>
+</body>
+
+<script>
+	var param = { speed: 80, color: "0,255,0", fontsize: 8, characters: "2800" };
+	
+	window.wallpaperPropertyListener = {
+		applyUserProperties: function (properties) {
+			if (properties.speed) { param.speed = properties.speed.value; }
+			if (properties.color) { param.color = properties.color.value.split(' ').map(function (c) { return Math.ceil(c * 255) }); }
+			if (properties.fontsize) { param.fontsize = properties.fontsize.value; }
+			if (properties.characters) { param.characters = properties.characters.value; }
+		}
+	};
+
+	var q = document.getElementById('q'),
+		// s = window.screen,
+		w = q.width = innerWidth,//s.width,
+		h = q.height = innerHeight,//s.height,
+		// p = Array(Math.round(w / (param.fontsize / 3))).join(1).split(''),
+        p = Array(Math.ceil(w / (param.fontsize / 3))).join(1).split(''),
+		c = q.getContext("2d"), m = Math;
+
+	matrix = function () {
+		c.fillStyle = "rgba(0,0,0,0.05)";
+		c.fillRect(0, 0, w, h);
+		c.fillStyle = "rgba(" + param.color + ",1)";
+
+		p = p.map(function (v, i) {
+			r = m.random();
+			c.font = param.fontsize + "px Verdana";
+
+            c.fillText(String.fromCharCode(m.floor(41 + r * (126 - 41))),
+			// c.fillText(String.fromCharCode(m.floor(30 + param.characters + r * 33)),
+				i * param.fontsize, v);
+
+            v += param.fontsize;
+
+            return v > 768 + r * 1e4 ? 0 : v
+		});
+
+		setTimeout(matrix, 140 - param.speed);
+	}
+
+	matrix();
+</script>
