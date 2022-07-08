@@ -1,59 +1,60 @@
 <template>
   <div id="header_itself">
-    <div class="header_tabs" @click="change_page(1)">Main Board</div>
-    <div class="header_tabs" @click="change_page(2)">Join US</div>
-    <div class="header_tabs" @click="change_page(3)">QA</div>
-    <div class="header_tabs" @click="change_page(4)">Resources</div>
-    <div class="header_tabs" @click="change_page(5)">About</div><!-- Home/ -->
-    <div class="header_tabs" @click="change_page(6)">Sign up/in</div>
+    <div class="header_tabs" onclick="window.open('/')">Main Board</div>
+    <div class="header_tabs" onclick="window.open('/')">QA</div>
+    <div class="header_tabs" onclick="window.open('/')">Resources</div>
+    <div class="header_tabs" onclick="window.open('/')">About</div>
+    <div class="header_tabs"><router-link to="/signup" target="_blank">Join US</router-link></div>
+    <div class="header_tabs" onclick="window.open('/')">Login</div>
   </div>
 </template>
 
 <script>
 
+import router from "@/router";
+
 export default {
   name: "top_navigator",
-  setup: () => {
-    // document.getElementsByClassName("header_tabs")
+  setup: () => {},
+  methods: {
 
   },
-  methods: {
-    change_page: (page_num) => {
-      if (page_num === 1) {
-        window.open('/')
-      // } else if (page_num===2) {
-      //
-      // } else if (page_num===3) {
-      //
-      // } else if (page_num===4) {
-
-      } else if (page_num===5) {
-        window.open('/about')
-      // } else if (page_num===6) {
-
-      }
-    },
-
-  }
 }
 </script>
 
 <style scoped>
+a {
+  text-decoration: none;
+  color: #67a5ac;
+}
+router-link {
+  text-decoration: none;
+  color: #67a5ac;
+}
+
 #header_itself {
   margin: 50px 10% 5px 0;
-  text-align: right;
-  /*position: absolute;*/
-  /*right: 0;*/
+  /*text-align: right;*/
+  color: #67a5ac;
+  position: absolute;
+  right: 0;
+  z-index: 1;
 }
 
 .header_tabs {
   display: inline-block;
   position: relative;
   margin: 2px 15px 2px 15px;
+
+  opacity: 0.6;
+  font-size: 16px;
+  transition: opacity, font-size;
 }
 
 .header_tabs:hover {
   cursor: pointer;
+
+  opacity: 1;
 }
 
 .header_tabs:after {

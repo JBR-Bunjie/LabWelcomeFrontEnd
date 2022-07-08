@@ -1,6 +1,7 @@
 <template>
   <div>
     <top_navigator></top_navigator>
+    <scrolling_bar></scrolling_bar>
 
     <div class="page" id="page1">
       <!--        <div>this is first page</div>-->
@@ -19,77 +20,100 @@
       </div>
     </div>
 
-    <div class="page" id="page2">
-      <div>
-        <canvas id="canvas_2"></canvas>
-      </div>
-    </div>
+<!--    <div class="page" id="page2">-->
+<!--      <div>-->
+<!--        <canvas id="canvas_2"></canvas>-->
+<!--      </div>-->
+<!--    </div>-->
 
-    <div class="page" id="page3">
-      <div>
-        <canvas id="canvas_3"></canvas>
-      </div>
-      <!--        <div>this is third page</div>-->
-    </div>
+<!--    <div class="page" id="page3">-->
+<!--      <div>-->
+<!--        <canvas id="canvas_3"></canvas>-->
+<!--      </div>-->
+<!--      &lt;!&ndash;        <div>this is third page</div>&ndash;&gt;-->
+<!--    </div>-->
 
   </div>
 </template>
 
 <script>
-// import 'pure-full-page/lib/pureFullPage.min.css'
-// import PureFullPage from 'pure-full-page/lib/pureFullPage.min'
-// new PureFullPage();
-import ScrollMagic from 'scrollmagic/scrollmagic/uncompressed/ScrollMagic'
 import "@/assets/css/global.css"
 import "@/assets/css/single_page.css"
-// import 'scrollmagic/scrollmagic/minified/ScrollMagic.min'
 
 import top_navigator from "@/components/top_navigator";
+import scrolling_bar from "@/components/scrolling_bar";
+
+// import "@/src/js/shape-shifter"
 
 let page_num = 0
 
-
 export default {
   name: "MainBoard",
-  components: {top_navigator},
+  components: {top_navigator, scrolling_bar},
   setup: () => {
 
   },
   methods: {
-    handle_scroll() {
-      // const st = window.pageYOffset || document.documentElement.scrollTop
-      const st = window.scrollY || document.documentElement.scrollTop
+    scrollFunc(any) {
+      any.preventDefault()
 
-      // alert(st + "\n" + document.documentElement.scrollTop)
+      any = any || Event;
 
-      if (st > document.documentElement.scrollTop) {
-        // up
-        alert("up")
-
+      const up_moving = () => {
         const target_position = document.documentElement.scrollTop - innerHeight
 
-        const global_scroll = setInterval(function () {
-          if (document.documentElement.scrollTop < target_position)
-            document.documentElement.scrollTop = document.documentElement.scrollTop - 10
-          else {
-            clearInterval(global_scroll)
-          }
-        }, 20)
+        if (Math.abs(document.documentElement.scrollTop / innerHeight - page_num) < 0.0006) {
+          const global_scroll = setInterval(function () {
+            if (document.documentElement.scrollTop < target_position) {
+              let moving_step = Math.log(innerHeight) / Math.log(5)
+              moving_step < 10 ? 10 : moving_step
 
-      } else {
-        // down
+              if (target_position - document.documentElement.scrollTop < 15)
+                document.documentElement.scrollTop = document.documentElement.scrollTop + target_position - document.documentElement.scrollTop
+              else
+                document.documentElement.scrollTop = document.documentElement.scrollTop + moving_step
+            } else {
+              clearInterval(global_scroll)
+              page_num--
+            }
+          }, 10)
+        }
+      }
+      const down_moving = () => {
         const target_position = document.documentElement.scrollTop + innerHeight
 
-        const global_scroll = setInterval(function () {
-          if (document.documentElement.scrollTop < target_position)
-            document.documentElement.scrollTop = document.documentElement.scrollTop + 10
-          else {
-            clearInterval(global_scroll)
-          }
-        }, 20)
+        if (Math.abs(document.documentElement.scrollTop / innerHeight - page_num) < 0.0006) {
+          let global_scroll = setInterval(function () {
+            if (document.documentElement.scrollTop < target_position) {
+              let moving_step = Math.log(innerHeight) / Math.log(3)
+              moving_step < 10 ? 10 : moving_step
 
-        clearInterval(global_scroll)
+              if (target_position - document.documentElement.scrollTop < 15)
+                document.documentElement.scrollTop = document.documentElement.scrollTop + target_position - document.documentElement.scrollTop
+              else
+                document.documentElement.scrollTop = document.documentElement.scrollTop + moving_step
+            } else {
+              clearInterval(global_scroll)
+              page_num++
+            }
+          }, 5)
+        }
+      }
 
+      if (any.wheelDelta) {
+        if (any.wheelDelta > 0) { // up scrolling
+          up_moving()
+        }
+        if (any.wheelDelta < 0) { // down scrolling
+          down_moving()
+        }
+      } else if (any.detail) {
+        if (any.detail < 0) { // up scrolling
+          up_moving()
+        }
+        if (any.detail > 0) { // down scrolling
+          down_moving()
+        }
       }
     },
     canvas_2() {
@@ -186,11 +210,16 @@ export default {
     }
   },
   created() {
-    window.addEventListener("scroll", this.handle_scroll)
-    // window.addEventListener("")
+
   },
 
   mounted() {
+    // 给页面绑定鼠标滚轮事件,针对火狐的非标准事件
+    // window.addEventListener("DOMMouseScroll", this.scrollFunc)
+    // 给页面绑定鼠标滚轮事件，针对Google，mousewheel非标准事件已被弃用，请使用 wheel事件代替
+    window.addEventListener("wheel", this.scrollFunc) // ie不支持wheel事件，若一定要兼容，可使用mousewheel
+    // window.addEventListener("mousewheel", this.scrollFunc)
+
     const catch_result = document.getElementsByClassName("page")
     for (let i = 0; i < catch_result.length; i++) {
       catch_result[i].style.height = `${innerHeight}px`
@@ -200,11 +229,18 @@ export default {
 
     this.canvas_2();
 
+    // const plugin = document.createElement("script");
+    // plugin.setAttribute(
+    //     "src",
+    //     "/src/assets/js/shape-shifter.js"
+    // );
+    // plugin.async = true;
+    // document.head.appendChild(plugin);
   },
   beforeUpdated() {
+
   },
   unmounted() {
-    window.removeEventListener("scroll", this.handle_scroll)
 
   }
 }
@@ -234,10 +270,14 @@ window.onunload = ev => {
   return ""
 }
 
-
 </script>
 
 <style scoped>
+body {
+  overflow-x: hidden;
+  overflow-y: hidden;
+}
+
 #scrolling_set {
   width: 100%;
   height: 100%;

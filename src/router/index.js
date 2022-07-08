@@ -13,15 +13,10 @@ const routes = [
     {path: '/', name: "MainBoard", component: MainBoard},
     {path: '/about', name: "WebsiteAbout", component: WebsiteAbout},
     {path: '/404', name: "NotFound", component: NotFound},
-    {path: '/login', name: "UserLogin", component: UserLogin},
     {path: '/home', name: "UserHome", component: UserHome},
+    {path: '/login', name: "UserLogin", component: UserLogin},
     {path: '/signup', name: "SignUp", component: SignUp},
 ]
-
-// const router = VueRouter.createRouter({
-//     history: VueRouter.createWebHashHistory(process.env.BASE_URL),
-//     routes: routes,
-// })
 
 const router = createRouter({
     history: createWebHashHistory(process.env.BASE_URL),
